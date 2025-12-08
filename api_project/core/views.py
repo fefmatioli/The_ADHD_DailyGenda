@@ -15,7 +15,6 @@ class OwnerQuerysetMixin:
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    # Implementado nas subclasses quando houver filtros extras
     def apply_filters(self, qs):
         return qs
 
