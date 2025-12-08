@@ -120,19 +120,25 @@ Windows:
 pip install -r requirements.txt
 ```
 
-### **4. Aplicar migrações**
+### **4. Entre na pasta "api_project"**
+
+```bash
+cd api_project
+```
+
+### **5. Aplicar migrações**
 
 ```bash
 python manage.py migrate
 ```
 
-### **5. Criar superusuário**
+### **6. Criar superusuário**
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### **6. Rodar o servidor**
+### **7. Rodar o servidor**
 
 ```bash
 python manage.py runserver

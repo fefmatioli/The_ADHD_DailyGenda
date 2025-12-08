@@ -263,20 +263,3 @@ ul {
   background-color: #d13c70;
 }
 
-.logout-btn {
-  background-color: #d13c70;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.logout-btn:hover {
-  background-color: #b83262;
-  transform: translateY(-1px);
-}

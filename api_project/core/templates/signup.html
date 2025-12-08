@@ -1,12 +1,57 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro - DailyGenda</title>
+    <title>Sign Up - DailyGenda</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
+
+        /* esconder a mensagem genérica padrão do Django (non field errors) */
+        ul.errorlist.nonfield {
+            display: none;
+        }
+
+        .card form input {
+            width: 100%;
+            max-width: 300px;
+            padding: 7px 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+        }
+
+        .card form p {
+            margin: 0.9rem 0;
+        }
+
+        .card form label {
+            display: block;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #666666;
+            margin-bottom: 0.3rem;
+        }
+
+        .card .helptext,
+        .card .helptext ul,
+        .card .helptext li {
+            color: #a00028 !important; 
+            font-size: 0.8rem !important;
+            font-weight: 500;
+            margin-top: 0.3rem;
+            line-height: 1.35rem;
+        }
+
+        .card form ul:not(.errorlist),
+        .card form ul:not(.errorlist) li {
+            color: #f5008f !important; 
+            font-size: 0.8rem !important;  
+            font-weight: 500;
+            line-height: 1.35rem;
+            margin-top: 0.3rem;
+        }
+
     </style>
 </head>
 <body>
@@ -15,22 +60,54 @@
     </header>
 
     <main style="display: flex; justify-content: center; margin-top: 3rem;">
-        <section class="card" style="max-width: 400px; width: 100%;">
-            <h2>Criar conta</h2>
+        <section class="card" style="max-width: 420px; width: 100%; padding: 2.2rem 2.2rem 2rem;">
+            <h2 style="
+                text-align: center;
+                font-size: 2rem;
+                color: #f02175;
+                margin: 0 0 1.8rem 0;
+                font-weight: 700;
+            ">
+                Sign Up
+            </h2>
 
             {% if form.errors %}
-                <p>Verifique os dados preenchidos.</p>
+                <p style="
+                    text-align: center;
+                    color: #a00028;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    margin: 0 0 1rem 0;
+                ">
+                    Please make sure all fields are filled in correctly.
+                </p>
             {% endif %}
 
-            <form method="post">
+            <form method="post" style="max-width: 320px; margin: 0 auto;">
                 {% csrf_token %}
                 {{ form.as_p }}
-                <button type="submit" class="submit-btn">Cadastrar</button>
+
+                <button type="submit" class="submit-btn" style="
+                    display: block;
+                    margin: 0.8rem auto 0 auto;
+                    padding: 0.6rem 1.0rem;
+                    border-radius: 999px;
+                    font-size: 1rem;
+                    font-weight: 400;
+                ">
+                    Sign Up
+                </button>
             </form>
 
-            <p style="margin-top: 1rem;">
-                Já tem conta?
-                <a href="{% url 'login' %}">Fazer login</a>
+            <p style="margin-top: 1.6rem; text-align: center;">
+                Already have an account?
+                <a href="{% url 'login' %}" style="
+                    color: #f02175;
+                    font-weight: 700;
+                    text-decoration: none;
+                ">
+                    Go to login
+                </a>
             </p>
         </section>
     </main>
