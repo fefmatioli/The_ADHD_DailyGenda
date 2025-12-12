@@ -300,7 +300,8 @@ ul {
   padding: 0.6rem 1rem;
   border-radius: 10px;
 }
-/* REMOVE ANY BULLETS OR INDENTATION FROM ALL LISTS IN THE DASHBOARD */
+
+
 .card ul,
 .card ul li,
 .event-list,
