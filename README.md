@@ -94,10 +94,6 @@ DB_HOST=localhost
 DB_PORT=5432
 ```
 
-Esse arquivo **não deve ser enviado ao GitHub**.
-
----
-
 ## ⚙️ Como rodar o projeto
 
 ### **1. Criar ambiente virtual**
