@@ -10,22 +10,21 @@ from django.contrib.auth import login, logout
 @login_required
 def dashboard(request):
     today = date.today()
+    
     todays_events = Event.objects.filter(user=request.user, date=today).order_by('time')
     month_events = Event.objects.filter(
         user=request.user, 
         date__month=today.month,
         date__year=today.year
     ).exclude(date=today).order_by('date')
-    future_events = Event.objects.filter(user=request.user, date__gt=today).exclude(date__month=today.month).order_by('date')
     
-    notes = Note.objects.filter(user=request.user).order_by('-created_at')
-    tasks = Task.objects.filter(user=request.user).order_by('done', '-created_at')
+    notes = Note.objects.filter(user=request.user).order_by('-id') 
+    tasks = Task.objects.filter(user=request.user).order_by('done', '-id')
 
     context = {
         "today": today,
         "todays_events": todays_events,
         "month_events": month_events,
-        "future_events": future_events,
         "notes": notes,
         "tasks": tasks,
         "note_form": NoteForm(),
