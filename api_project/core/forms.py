@@ -6,10 +6,7 @@ from django.contrib.auth.models import User
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
-        fields = ["title", "content", "category", "date"]
-        widgets = {
-            "date": forms.DateInput(attrs={"type": "date"}),
-        }
+        fields = ["title", "content", "category"]
 
 class TaskForm(forms.ModelForm):
     class Meta:

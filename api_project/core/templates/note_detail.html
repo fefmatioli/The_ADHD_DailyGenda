@@ -20,9 +20,6 @@
   <main class="note-detail-container">
     <div class="note-card-full">
       <p><strong>Category:</strong> {{ note.get_category_display }}</p>
-      {% if note.date %}
-        <p><strong>Date:</strong> {{ note.date|date:"d/m/Y" }}</p>
-      {% endif %}
       <hr>
       <p>{{ note.content|linebreaksbr }}</p>
     </div>
