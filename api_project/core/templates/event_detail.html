@@ -1,34 +1,63 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ event.title }} | The ADHD DailyGenda</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-  <header class="header">
-    <div class="nav-buttons">
-    <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
-    <a href="{% url 'event_edit' event.id %}" class="edit-btn">✏️ Edit</a>
-  </div>
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} | DailyGenda{% endblock %}
+
+{% block content %}
+  <header class="page-header">
+    <h1>{{ event.title }}</h1>
+    <p class="page-subtitle">
+      {{ event.date|date:"d/m/Y" }}
+      {% if event.time %}
+        · {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+      {% endif %}
+    </p>
   </header>
 
-  <main class="note-detail-container">
-    <div class="note-card-full">
-      <p><strong>Date:</strong> {{ event.date|date:"d/m/Y" }}</p>
-      {% if event.time %}
-        <p><strong>Time:</strong> {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}</p>
-      {% endif %}
-      {% if event.description %}
-        <hr>
-        <p>{{ event.description|linebreaksbr }}</p>
-      {% endif %}
-      <form method="post" action="{% url 'delete_event' event.id %}" style="margin-top: 1rem;">
-            {% csrf_token %}
-            <button type="submit" class="delete-btn-text">Delete</button>
-        </form>
+  <div class="card">
+    <div class="flex-header">
+      <h2>Details</h2>
+      <div class="row-actions">
+        <a class="btn-ghost" href="{% url 'dashboard' %}">Back</a>
+        <a class="btn-submit" href="{% url 'event_edit' event.id %}">Edit</a>
+      </div>
     </div>
-  </main>
-</body>
-</html>
+
+    <ul class="list">
+      <li class="list-row" style="grid-template-columns: 1fr;">
+        <div>
+          <div class="row-title">Date</div>
+          <div class="muted" style="margin-top: 0.25rem;">
+            {{ event.date|date:"l, d/m/Y" }}
+          </div>
+        </div>
+      </li>
+
+      {% if event.time %}
+      <li class="list-row" style="grid-template-columns: 1fr;">
+        <div>
+          <div class="row-title">Time</div>
+          <div class="muted" style="margin-top: 0.25rem;">
+            {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+          </div>
+        </div>
+      </li>
+      {% endif %}
+
+      {% if event.description %}
+      <li class="list-row" style="grid-template-columns: 1fr;">
+        <div>
+          <div class="row-title">Description</div>
+          <div class="muted" style="margin-top: 0.45rem; line-height: 1.45;">
+            {{ event.description|linebreaksbr }}
+          </div>
+        </div>
+      </li>
+      {% endif %}
+    </ul>
+
+    <form method="post" action="{% url 'delete_event' event.id %}" style="margin-top: 1rem;">
+      {% csrf_token %}
+      <button type="submit" class="delete-btn-text">Delete</button>
+    </form>
+  </div>
+{% endblock %}
