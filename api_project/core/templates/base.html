@@ -4,18 +4,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% block title %}Focusly{% endblock %}</title>
+  <title>{% block title %}DailyGenda{% endblock %}</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-
-  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=1">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
   {% block extra_head %}{% endblock %}
 </head>
-<body class="app-shell">
 
+<body class="app-shell">
+  <!-- ===== Sidebar ===== -->
   <aside class="sidebar">
     <div class="sidebar-top">
       <div class="brand">
@@ -42,6 +38,14 @@
           <button type="button" class="theme-btn" onclick="setTheme('pink')">Pink</button>
         </div>
       </div>
+
+      <div class="sidebar-box">
+        <div class="box-title">Pages</div>
+        <div class="sidebar-links">
+          <a class="sidebar-link" href="{% url 'dashboard' %}">Dashboard</a>
+          <a class="sidebar-link" href="{% url 'calendar_month' %}">Calendar</a>
+        </div>
+      </div>
     </div>
 
     <div class="sidebar-bottom">
@@ -52,10 +56,12 @@
     </div>
   </aside>
 
+  <!-- ===== Main content ===== -->
   <main class="content">
     {% block content %}{% endblock %}
   </main>
 
+  <!-- ===== JS (shared) ===== -->
   <script>
     function setTheme(themeName) {
       document.documentElement.setAttribute('data-theme', themeName);

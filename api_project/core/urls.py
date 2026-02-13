@@ -18,4 +18,6 @@ urlpatterns = [
     path("login/", auth_views.LoginView.as_view(template_name="login.html"), name="login"), 
     path("logout/", auth_views.LogoutView.as_view(), name="logout"), 
     path("signup/", views_site.signup, name="signup"), 
+    path("calendar/", views_site.calendar_month, name="calendar_month"),
+    path("calendar/<int:year>/<int:month>/", views_site.calendar_month, name="calendar_month"),
 ]

@@ -5,7 +5,10 @@ from .models import Note, Task, Event
 from .forms import NoteForm, TaskForm, EventForm, CustomUserCreationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-
+import calendar
+from datetime import date
+from django.utils import timezone
+from .models import Event
 
 @login_required
 def dashboard(request):
@@ -31,6 +34,9 @@ def dashboard(request):
         "task_form": TaskForm(),
         "event_form": EventForm(),
     }
+
+    context.update(build_calendar_context(request.user))
+
     return render(request, "dashboard.html", context)
 
 @login_required
@@ -121,6 +127,62 @@ def event_edit(request, event_id):
     else:
         form = EventForm(instance=event)
     return render(request, "event_edit.html", {"form": form, "event": event})
+
+def build_calendar_context(user, year=None, month=None):
+    today = timezone.localdate()
+
+    year = int(year) if year is not None else today.year
+    month = int(month) if month is not None else today.month
+
+    cal = calendar.Calendar(firstweekday=6)  # Sunday
+    month_days = list(cal.itermonthdates(year, month))
+    weeks_dates = [month_days[i:i+7] for i in range(0, len(month_days), 7)]
+
+    first_day = date(year, month, 1)
+    last_day = date(year, month, calendar.monthrange(year, month)[1])
+
+    month_events = (
+        Event.objects
+        .filter(user=user, date__range=(first_day, last_day))
+        .order_by("date", "time")
+    )
+
+    events_by_day = {}
+    for ev in month_events:
+        events_by_day.setdefault(ev.date, []).append(ev)
+
+    weeks = []
+    for week in weeks_dates:
+        week_cells = []
+        for day in week:
+            week_cells.append({
+                "day": day,
+                "is_out": day.month != month,
+                "is_today": day == today,
+                "events": events_by_day.get(day, []),
+            })
+        weeks.append(week_cells)
+
+    prev_year, prev_month = (year - 1, 12) if month == 1 else (year, month - 1)
+    next_year, next_month = (year + 1, 1) if month == 12 else (year, month + 1)
+
+    return {
+        "cal_year": year,
+        "cal_month": month,
+        "cal_month_name": calendar.month_name[month],
+        "cal_weeks": weeks,
+        "cal_today": today,
+        "cal_prev_year": prev_year,
+        "cal_prev_month": prev_month,
+        "cal_next_year": next_year,
+        "cal_next_month": next_month,
+        "cal_month_events": month_events,
+    }
+
+@login_required
+def calendar_month(request, year=None, month=None):
+    ctx = build_calendar_context(request.user, year=year, month=month)
+    return render(request, "calendar_page.html", ctx)
 
 def signup(request):
     if request.method == "POST":

@@ -1,44 +1,8 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Focusly | Dashboard</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body class="app-shell">
+{% extends "base.html" %}
 
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="brand">
-        <img src="{% static 'images/logo_final.png' %}" class="brand-logo">
-        <span class="brand-text">Focusly</span>
-      </div>
+{% block title %}Dashboard | Focusly{% endblock %}
 
-      <div class="sidebar-box">
-        <div class="user-name">{{ request.user.username }}</div>
-        <div class="user-email">{{ request.user.email }}</div>
-      </div>
-
-      <div class="sidebar-box">
-        <div class="box-title">Theme</div>
-        <div class="theme-actions">
-          <button type="button" class="theme-btn" onclick="setTheme('light')">Light</button>
-          <button type="button" class="theme-btn" onclick="setTheme('dark')">Dark</button>
-          <button type="button" class="theme-btn" onclick="setTheme('pink')">Pink</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-bottom">
-      <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn-submit">Logout</button>
-      </form>
-    </div>
-  </aside>
-
+{% block content %}
   <main class="content">
     <header class="page-header">
       <h1>Dashboard</h1>
@@ -46,119 +10,151 @@
     </header>
 
     <div class="dashboard-grid">
-      <!-- ===== EVENTS (main column) ===== -->
-      <section>
-        <div class="card">
-          <div class="flex-header">
-            <h2>Events</h2>
-            <button class="add-btn" type="button" onclick="toggleForm('event-form')">+</button>
+    <section>
+      <!-- ===== MINI CALENDAR (ABOVE EVENTS) ===== -->
+      <div class="card">
+        <div class="flex-header">
+          <div>
+            <h2>{{ cal_month_name }} {{ cal_year }}</h2>
+            <p class="page-subtitle" style="margin-top:0.25rem;">Monthly overview</p>
           </div>
 
-          <form id="event-form" class="hidden-form" method="post" action="{% url 'create_event' %}">
-            {% csrf_token %}
-            {{ event_form.as_p }}
-            <div class="form-actions">
-              <button type="submit" class="btn-submit">Save event</button>
-            </div>
-          </form>
-
-          <h3 class="section-title">Today</h3>
-          {% if todays_events %}
-            <ul class="list">
-              {% for event in todays_events %}
-                <li class="list-row">
-                  <div>
-                    <a href="{% url 'event_detail' event.id %}">
-                      <div class="row-title">{{ event.title }}</div>
-                    </a>
-                    <div class="muted">
-                      {% if event.time %}
-                        {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
-                      {% else %}
-                        No time set
-                      {% endif %}
-                    </div>
-                  </div>
-
-                  <div class="row-actions">
-                    <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
-                    <form method="post" action="{% url 'delete_event' event.id %}">
-                      {% csrf_token %}
-                      <button type="submit" class="delete-btn-text">Delete</button>
-                    </form>
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="empty">No events today.</p>
-          {% endif %}
-
-          <h3 class="section-title">This month</h3>
-          {% if month_events %}
-            <ul class="list">
-              {% for event in month_events %}
-                <li class="list-row">
-                  <div>
-                    <a href="{% url 'event_detail' event.id %}">
-                      <div class="row-title">{{ event.date|date:"d/m" }} — {{ event.title }}</div>
-                    </a>
-                    <div class="muted">
-                      {% if event.time %}
-                        {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
-                      {% else %}
-                        No time set
-                      {% endif %}
-                    </div>
-                  </div>
-
-                  <div class="row-actions">
-                    <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
-                    <form method="post" action="{% url 'delete_event' event.id %}">
-                      {% csrf_token %}
-                      <button type="submit" class="delete-btn-text">Delete</button>
-                    </form>
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="empty">No other events this month.</p>
-          {% endif %}
-
-          <h3 class="section-title">Upcoming</h3>
-          {% if future_events %}
-            <ul class="list">
-              {% for event in future_events %}
-                <li class="list-row">
-                  <div>
-                    <a href="{% url 'event_detail' event.id %}">
-                      <div class="row-title">{{ event.date|date:"d/m/Y" }} — {{ event.title }}</div>
-                    </a>
-                    <div class="muted">
-                      {% if event.time %}
-                        {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
-                      {% else %}
-                        No time set
-                      {% endif %}
-                    </div>
-                  </div>
-
-                  <div class="row-actions">
-                    <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
-                    <form method="post" action="{% url 'delete_event' event.id %}">
-                      {% csrf_token %}
-                      <button type="submit" class="delete-btn-text">Delete</button>
-                    </form>
-                  </div>
-                </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="empty">No future events scheduled.</p>
-          {% endif %}
+          <div class="row-actions">
+            <a class="btn-ghost" href="{% url 'calendar_month' cal_prev_year cal_prev_month %}">Prev</a>
+            <a class="btn-ghost" href="{% url 'calendar_month' %}">Open</a>
+            <a class="btn-ghost" href="{% url 'calendar_month' cal_next_year cal_next_month %}">Next</a>
+          </div>
         </div>
-      </section>
+
+        <div class="mini-cal">
+          <div class="mini-cal-dow">S</div><div class="mini-cal-dow">M</div><div class="mini-cal-dow">T</div>
+          <div class="mini-cal-dow">W</div><div class="mini-cal-dow">T</div><div class="mini-cal-dow">F</div><div class="mini-cal-dow">S</div>
+
+          {% for week in cal_weeks %}
+            {% for cell in week %}
+              <div class="mini-cal-cell {% if cell.is_out %}is-out{% endif %} {% if cell.is_today %}is-today{% endif %}">
+                <div class="mini-cal-date">{{ cell.day.day }}</div>
+                {% if cell.events %}
+                  <div class="mini-cal-dot" title="{{ cell.events|length }} event(s)"></div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- ===== EVENTS ===== -->
+      <div class="card">
+        <div class="flex-header">
+          <h2>Events</h2>
+          <button class="add-btn" type="button" onclick="toggleForm('event-form')">+</button>
+        </div>
+
+        <form id="event-form" class="hidden-form" method="post" action="{% url 'create_event' %}">
+          {% csrf_token %}
+          {{ event_form.as_p }}
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">Save event</button>
+          </div>
+        </form>
+
+        <h3 class="section-title">Today</h3>
+        {% if todays_events %}
+          <ul class="list">
+            {% for event in todays_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' event.id %}">
+                    <div class="row-title">{{ event.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if event.time %}
+                      {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+                    {% else %}
+                      No time set
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
+                  <form method="post" action="{% url 'delete_event' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn-text">Delete</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">No events today.</p>
+        {% endif %}
+
+        <h3 class="section-title">This month</h3>
+        {% if month_events %}
+          <ul class="list">
+            {% for event in month_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' event.id %}">
+                    <div class="row-title">{{ event.date|date:"d/m" }} — {{ event.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if event.time %}
+                      {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+                    {% else %}
+                      No time set
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
+                  <form method="post" action="{% url 'delete_event' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn-text">Delete</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">No other events this month.</p>
+        {% endif %}
+
+        <h3 class="section-title">Upcoming</h3>
+        {% if future_events %}
+          <ul class="list">
+            {% for event in future_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' event.id %}">
+                    <div class="row-title">{{ event.date|date:"d/m/Y" }} — {{ event.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if event.time %}
+                      {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+                    {% else %}
+                      No time set
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
+                  <form method="post" action="{% url 'delete_event' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn-text">Delete</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">No future events scheduled.</p>
+        {% endif %}
+      </div>
+    </section>
 
       <!-- ===== RIGHT COLUMN: TASKS + NOTES ===== -->
       <aside>
@@ -267,5 +263,4 @@
       form.style.display = isOpen ? 'none' : 'block';
     }
   </script>
-</body>
-</html>
+{% endblock %}

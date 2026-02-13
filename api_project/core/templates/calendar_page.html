@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar | Focusly{% endblock %}
+
+{% block content %}
+  <header class="page-header">
+    <h1>Calendar</h1>
+    <p class="page-subtitle">Your month at a glance, with a clear event list.</p>
+  </header>
+
+  <div class="dashboard-grid">
+    <!-- ===== Calendar (2/3) ===== -->
+    <section>
+      <div class="card">
+        <div class="flex-header">
+          <h2>{{ cal_month_name }} {{ cal_year }}</h2>
+          <div class="row-actions">
+            <a class="btn-ghost" href="{% url 'calendar_month' cal_prev_year cal_prev_month %}">Prev</a>
+            <a class="btn-ghost" href="{% url 'calendar_month' %}">Today</a>
+            <a class="btn-ghost" href="{% url 'calendar_month' cal_next_year cal_next_month %}">Next</a>
+          </div>
+        </div>
+
+        <div class="cal-grid">
+          <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+          <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div><div class="cal-dow">Sat</div>
+
+          {% for week in cal_weeks %}
+            {% for cell in week %}
+              <div class="cal-cell {% if cell.is_out %}cal-out{% endif %} {% if cell.is_today %}cal-today{% endif %}">
+                <div class="cal-date">{{ cell.day.day }}</div>
+
+                <div class="cal-events">
+                  {% if cell.events %}
+                    {% for ev in cell.events|slice:":3" %}
+                      <a class="cal-event" href="{% url 'event_detail' ev.id %}">
+                        <span class="cal-event-time">
+                          {% if ev.time %}{{ ev.time|time:"H:i" }}{% else %}All day{% endif %}
+                        </span>
+                        <span class="cal-event-title">{{ ev.title }}</span>
+                      </a>
+                    {% endfor %}
+
+                    {% if cell.events|length > 3 %}
+                      <div class="cal-more muted">+{{ cell.events|length|add:"-3" }} more</div>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Events list (1/3) ===== -->
+    <aside>
+      <div class="card">
+        <div class="flex-header">
+          <h2>Events</h2>
+          <span class="muted">{{ cal_month_name }}</span>
+        </div>
+
+        {% if cal_month_events %}
+          <ul class="list">
+            {% for ev in cal_month_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' ev.id %}">
+                    <div class="row-title">{{ ev.date|date:"d/m" }} — {{ ev.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if ev.time %}
+                      {{ ev.time }}{% if ev.end_time %} → {{ ev.end_time }}{% endif %}
+                    {% else %}
+                      All day
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_edit' ev.id %}">Edit</a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">No events this month.</p>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+{% endblock %}
