@@ -203,10 +203,23 @@ h1, h2, h3{ margin: 0; }
   letter-spacing: -0.3px;
 }
 
+.page-header2 h1{
+  font-size: 1.9rem;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
 .page-subtitle{
   color: var(--color-muted);
   font-size: 0.98rem;
   line-height: 1.35;
+}
+
+.page-subtitle2{
+  color: var(--color-muted);
+  font-size: 0.98rem;
+  line-height: 1.35;
+  text-align: center;
 }
 
 /* ===== Dashboard grid ===== */
