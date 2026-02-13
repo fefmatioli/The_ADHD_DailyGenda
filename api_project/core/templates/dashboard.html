@@ -1,188 +1,266 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>The ADHD DailyGenda</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
 
-  <!-- ===== CABEÇALHO ===== -->
-  <header class="header">
-    <h1>The ADHD DailyGenda</h1>
-    <div class="user-info">
-      <p>Welcome, {{ request.user.username }}</p>
-      <form action="{% url 'logout' %}" method="post" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" class="submit-btn">Logout</button>
-      </form> 
-    </div>
-  </header>
+{% block title %}Dashboard | Focusly{% endblock %}
 
-  <!-- ===== CONTEÚDO PRINCIPAL ===== -->
-  <main class="main-grid">
+{% block content %}
+  <main class="content">
+    <header class="page-header">
+      <h1>Dashboard</h1>
+      <p class="page-subtitle">Low friction overview of your day</p>
+    </header>
 
-    <!-- === CALENDÁRIO === -->
-    <section class="card calendar-card">
-    <div class="card-header">
-        <h2>📅 Events</h2>
-        <button class="add-btn" onclick="toggleForm('event-form')">+</button>
-    </div>
+    <div class="dashboard-grid">
+    <section>
+      <!-- ===== MINI CALENDAR (ABOVE EVENTS) ===== -->
+      <div class="card">
+        <div class="flex-header">
+          <div>
+            <h2>{{ cal_month_name }} {{ cal_year }}</h2>
+            <p class="page-subtitle" style="margin-top:0.25rem;">Monthly overview</p>
+          </div>
 
-    <!-- === Today’s Events === -->
-    <h3 class="event-subtitle">🕒 Today’s Events</h3>
-    {% if todays_events %}
-        <ul class="event-list">
-        {% for event in todays_events %}
-            <li>
-            <a href="{% url 'event_detail' event.id %}" class="event-link">
-                <strong>{{ event.title }}</strong>
-            </a>
-            {% if event.time %}
-                <span class="event-time">
-                ⏰ {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
-                </span>
-            {% endif %}
-            <form method="post" action="{% url 'delete_event' event.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="delete-btn-text">Delete</button>
-            </form>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p class="empty">No events today.</p>
-    {% endif %}
+          <div class="row-actions">
+            <a class="btn-ghost" href="{% url 'calendar_month' cal_prev_year cal_prev_month %}">Prev</a>
+            <a class="btn-ghost" href="{% url 'calendar_month' %}">Open</a>
+            <a class="btn-ghost" href="{% url 'calendar_month' cal_next_year cal_next_month %}">Next</a>
+          </div>
+        </div>
 
-    <!-- === This Month’s Events === -->
-    <h3 class="event-subtitle">📆 This Month’s Events</h3>
-    {% if month_events %}
-        <ul class="event-list">
-        {% for event in month_events %}
-            <li>
-                <a href="{% url 'event_detail' event.id %}" class="event-link">
-                <strong>{{ event.date|date:"d/m" }} — {{ event.title }}</strong>
-                </a>
-                {% if event.time %}
-                <span class="event-time">⏰ {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}</span>
+        <div class="mini-cal">
+          <div class="mini-cal-dow">S</div><div class="mini-cal-dow">M</div><div class="mini-cal-dow">T</div>
+          <div class="mini-cal-dow">W</div><div class="mini-cal-dow">T</div><div class="mini-cal-dow">F</div><div class="mini-cal-dow">S</div>
+
+          {% for week in cal_weeks %}
+            {% for cell in week %}
+              <div class="mini-cal-cell {% if cell.is_out %}is-out{% endif %} {% if cell.is_today %}is-today{% endif %}">
+                <div class="mini-cal-date">{{ cell.day.day }}</div>
+                {% if cell.events %}
+                  <div class="mini-cal-dot" title="{{ cell.events|length }} event(s)"></div>
                 {% endif %}
-                <form method="post" action="{% url 'delete_event' event.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="delete-btn-text">Delete</button>
-                </form>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p class="empty">No other events this month.</p>
-    {% endif %}
-
-    <!-- === Upcoming Events === -->
-    <h3 class="event-subtitle">🚀 Upcoming Events</h3>
-    {% if future_events %}
-        <ul class="event-list">
-        {% for event in future_events %}
-            <li>
-                <a href="{% url 'event_detail' event.id %}" class="event-link">
-                <strong>{{ event.date|date:"d/m/Y" }} — {{ event.title }}</strong>
-                </a>
-                {% if event.time %}
-                <span class="event-time">⏰ {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}</span>
-                {% endif %}
-                <form method="post" action="{% url 'delete_event' event.id %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="delete-btn-text">Delete</button>
-                </form>
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p class="empty">No future events scheduled.</p>
-    {% endif %}
-
-    <!-- === Formulário de Novo Evento === -->
-    <form id="event-form" class="hidden-form" method="post" action="{% url 'create_event' %}">
-        {% csrf_token %}
-        {{ event_form.as_p }}
-        <button type="submit" class="submit-btn">Save event</button>
-    </form>
-    </section>
-
-    <!-- === TO DO LIST === -->
-    <section class="card todo-card">
-      <div class="card-header">
-        <h2>🧾 To Do List</h2>
-        <button class="add-btn" onclick="toggleForm('task-form')">+</button>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        </div>
       </div>
-        {% if tasks %}
-            <ul class="task-list">
-                {% for task in tasks %}
-                <li class="{% if task.done %}done{% endif %}">
-                    <form method="post" action="{% url 'toggle_task' task.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="check-btn">✔</button>
-                    <span>{{ task.title }}</span>
-                    </form>
-                    <form method="post" action="{% url 'delete_task' task.id %}" style="display:inline;">
+
+      <!-- ===== EVENTS ===== -->
+      <div class="card">
+        <div class="flex-header">
+          <h2>Events</h2>
+          <button class="add-btn" type="button" onclick="toggleForm('event-form')">+</button>
+        </div>
+
+        <form id="event-form" class="hidden-form" method="post" action="{% url 'create_event' %}">
+          {% csrf_token %}
+          {{ event_form.as_p }}
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">Save event</button>
+          </div>
+        </form>
+
+        <h3 class="section-title">Today</h3>
+        {% if todays_events %}
+          <ul class="list">
+            {% for event in todays_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' event.id %}">
+                    <div class="row-title">{{ event.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if event.time %}
+                      {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+                    {% else %}
+                      No time set
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
+                  <form method="post" action="{% url 'delete_event' event.id %}">
                     {% csrf_token %}
                     <button type="submit" class="delete-btn-text">Delete</button>
-                    </form>
-                </li>
+                  </form>
+                </div>
+              </li>
             {% endfor %}
-            </ul>
+          </ul>
         {% else %}
-            <p class="empty">Nenhuma tarefa cadastrada.</p>
+          <p class="empty">No events today.</p>
         {% endif %}
-      <form id="task-form" class="hidden-form" method="post" action="{% url 'create_task' %}">
-        {% csrf_token %}
-        {{ task_form.as_p }}
-        <button type="submit" class="submit-btn">Salvar tarefa</button>
-      </form>
+
+        <h3 class="section-title">This month</h3>
+        {% if month_events %}
+          <ul class="list">
+            {% for event in month_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' event.id %}">
+                    <div class="row-title">{{ event.date|date:"d/m" }} — {{ event.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if event.time %}
+                      {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+                    {% else %}
+                      No time set
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
+                  <form method="post" action="{% url 'delete_event' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn-text">Delete</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">No other events this month.</p>
+        {% endif %}
+
+        <h3 class="section-title">Upcoming</h3>
+        {% if future_events %}
+          <ul class="list">
+            {% for event in future_events %}
+              <li class="list-row">
+                <div>
+                  <a href="{% url 'event_detail' event.id %}">
+                    <div class="row-title">{{ event.date|date:"d/m/Y" }} — {{ event.title }}</div>
+                  </a>
+                  <div class="muted">
+                    {% if event.time %}
+                      {{ event.time }}{% if event.end_time %} → {{ event.end_time }}{% endif %}
+                    {% else %}
+                      No time set
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row-actions">
+                  <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Open</a>
+                  <form method="post" action="{% url 'delete_event' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="delete-btn-text">Delete</button>
+                  </form>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="empty">No future events scheduled.</p>
+        {% endif %}
+      </div>
     </section>
 
-    <!-- === NOTAS === -->
-    <section class="card notes-card">
-      <div class="card-header">
-        <h2>📝 Notes</h2>
-        <button class="add-btn" onclick="toggleForm('note-form')">+</button>
-      </div>
-        {% if notes %}
-            <ul class="note-list">
-                {% for note in notes %}
-                <li class="note-item">
-                    <a href="{% url 'note_detail' note.id %}" class="note-link">
-                        <strong>{{ note.title }}</strong>
-                        <p>{{ note.content|truncatechars:80 }}</p>
+      <!-- ===== RIGHT COLUMN: TASKS + NOTES ===== -->
+      <aside>
+        <div class="card">
+          <div class="flex-header">
+            <h2>Tasks</h2>
+            <button class="add-btn" type="button" onclick="toggleForm('task-form')">+</button>
+          </div>
+
+          <form id="task-form" class="hidden-form" method="post" action="{% url 'create_task' %}">
+            {% csrf_token %}
+            {{ task_form.as_p }}
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">Add task</button>
+            </div>
+          </form>
+
+          {% if tasks %}
+            <ul class="list">
+              {% for task in tasks %}
+                <li class="list-row {% if task.done %}task-done{% endif %}">
+                  <div class="task-line">
+                    <form method="post" action="{% url 'toggle_task' task.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="check-btn">✓</button>
+                    </form>
+                    <div class="row-title">{{ task.title }}</div>
+                  </div>
+
+                  <div class="row-actions">
+                    <form method="post" action="{% url 'delete_task' task.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="delete-btn-text">Delete</button>
+                    </form>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="empty">No tasks yet.</p>
+          {% endif %}
+        </div>
+
+        <div class="card">
+          <div class="flex-header">
+            <h2>Notes</h2>
+            <button class="add-btn" type="button" onclick="toggleForm('note-form')">+</button>
+          </div>
+
+          <form id="note-form" class="hidden-form" method="post" action="{% url 'create_note' %}">
+            {% csrf_token %}
+            {{ note_form.as_p }}
+            <div class="form-actions">
+              <button type="submit" class="btn-submit">Save note</button>
+            </div>
+          </form>
+
+          {% if notes %}
+            <ul class="list">
+              {% for note in notes %}
+                <li class="list-row">
+                  <div>
+                    <a href="{% url 'note_detail' note.id %}">
+                      <div class="row-title">{{ note.title }}</div>
                     </a>
-                    <span class="tag">{{ note.get_category_display }}</span>
-                    <form method="post" action="{% url 'delete_note' note.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="delete-btn-text">Delete</button>
-                    </form>
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p class="empty">Nenhuma nota criada.</p>
-        {% endif %}
-      <form id="note-form" class="hidden-form" method="post" action="{% url 'create_note' %}">
-        {% csrf_token %}
-        {{ note_form.as_p }}
-        <button type="submit" class="submit-btn">Salvar nota</button>
-      </form>
-    </section>
+                    <div class="muted">
+                      {{ note.content|truncatechars:90 }}
+                    </div>
+                    <div style="margin-top:0.5rem;">
+                      <span class="tag">{{ note.get_category_display }}</span>
+                    </div>
+                  </div>
 
+                  <div class="row-actions">
+                    <a class="btn-ghost" href="{% url 'note_detail' note.id %}">Open</a>
+                    <form method="post" action="{% url 'delete_note' note.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="delete-btn-text">Delete</button>
+                    </form>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="empty">No notes yet.</p>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
   </main>
 
   <script>
+    function setTheme(themeName) {
+      document.documentElement.setAttribute('data-theme', themeName);
+      localStorage.setItem('theme', themeName);
+    }
+
+    (function initTheme(){
+      const saved = localStorage.getItem('theme');
+      document.documentElement.setAttribute('data-theme', saved || 'light');
+    })();
+
     function toggleForm(id) {
       const form = document.getElementById(id);
-      form.style.display = form.style.display === 'block' ? 'none' : 'block';
+      const isOpen = form.style.display === 'block';
+      form.style.display = isOpen ? 'none' : 'block';
     }
   </script>
-</body>
-</html>
+{% endblock %}

@@ -1,25 +1,26 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Edit Event | The ADHD DailyGenda</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-  <header class="header">
+{% extends "base.html" %}
+
+{% block title %}Edit Event | Focusly{% endblock %}
+
+{% block content %}
+  <header class="page-header">
     <h1>Edit Event</h1>
-    <a href="{% url 'event_detail' event.id %}" class="back-btn">← Back to Event</a>
+    <p class="page-subtitle">Update your event details.</p>
   </header>
 
-  <main class="note-detail-container">
-    <div class="note-card-full">
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="submit-btn">Save changes</button>
-      </form>
+  <div class="card">
+    <div class="flex-header">
+      <h2>Editing</h2>
+      <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Back to event</a>
     </div>
-  </main>
-</body>
-</html>
+
+    <form method="post" class="form-stacked">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">Save changes</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}
