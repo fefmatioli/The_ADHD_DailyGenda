@@ -14,7 +14,7 @@
       <a class="btn-ghost" href="{% url 'event_detail' event.id %}">Back to event</a>
     </div>
 
-    <form method="post">
+    <form method="post" class="form-stacked">
       {% csrf_token %}
       {{ form.as_p }}
 

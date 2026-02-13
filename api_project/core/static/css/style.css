@@ -396,6 +396,61 @@ h1, h2, h3{ margin: 0; }
   justify-content: flex-end;
 }
 
+/* ===== Forms (cards): same look as dashboard add-forms ===== */
+.form-stacked p{
+  margin: 0 0 0.85rem 0;
+}
+
+.form-stacked label{
+  display: block;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-bottom: 0.35rem;
+}
+
+.form-stacked input,
+.form-stacked select,
+.form-stacked textarea{
+  width: 100%;
+  max-width: 620px;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  background: var(--color-card);
+  color: var(--color-text);
+  padding: 0.65rem 0.8rem;
+  outline: none;
+}
+
+.form-stacked textarea{
+  min-height: 160px;
+  resize: vertical;
+}
+
+.form-stacked input:focus,
+.form-stacked select:focus,
+.form-stacked textarea:focus{
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--input-border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+/* Django messages */
+.form-stacked .helptext{
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.form-stacked ul.errorlist{
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0 0;
+  color: #b42318;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
 /* ===== Lists ===== */
 .list{
   list-style: none;
@@ -731,5 +786,68 @@ h1, h2, h3{ margin: 0; }
 
 .cal-more{
   margin-top: 0.2rem;
+  font-size: 0.85rem;
+}
+
+/* ===== Fix: Django form.as_p layout on edit pages ===== */
+.card .form-stacked{
+  max-width: 720px;
+}
+
+.card .form-stacked p{
+  margin: 0 0 0.95rem 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+}
+
+.card .form-stacked label{
+  display: block;
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.card .form-stacked input,
+.card .form-stacked select,
+.card .form-stacked textarea{
+  width: 100%;
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  background: var(--color-card);
+  color: var(--color-text);
+  padding: 0.65rem 0.8rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.card .form-stacked textarea{
+  min-height: 180px;
+  resize: vertical;
+}
+
+.card .form-stacked input:focus,
+.card .form-stacked select:focus,
+.card .form-stacked textarea:focus{
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--input-border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+/* Help + errors */
+.card .form-stacked .helptext{
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.card .form-stacked ul.errorlist{
+  list-style: none;
+  padding: 0;
+  margin: 0.2rem 0 0 0;
+  color: #b42318;
+  font-weight: 700;
   font-size: 0.85rem;
 }
